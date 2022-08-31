@@ -16,7 +16,7 @@ class HaulmontSpringTaskApplicationTests {
     @Test
     void checkUser() {
         User systemUser = databaseUserRepository.getSystemUser();
-        assertEquals(systemUser.getUsername(), "system1", "System user is not correct");
+        assertEquals(systemUser.getUsername(), "system", "System user is not correct");
     }
 
 }
