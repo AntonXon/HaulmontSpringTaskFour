@@ -1,10 +1,11 @@
 package com.company.haulmontspringtask.repository;
 
-import com.company.haulmontspringtask.entity.ExamSheet;
+
 import com.company.haulmontspringtask.entity.Teacher;
 import com.company.haulmontspringtask.entity.User;
-import com.company.haulmontspringtask.security.DatabaseUserRepository;
 import io.jmix.core.DataManager;
+import io.jmix.core.FetchPlan;
+import io.jmix.core.FetchPlans;
 import io.jmix.core.security.SystemAuthenticator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +30,8 @@ public class TeacherRepositoryTest {
     TeacherRepository teacherRepository;
     @Autowired
     SystemAuthenticator systemAuthenticator;
+    @Autowired
+    FetchPlans fetchPlans;
 
     @BeforeEach
     void setUp() {
@@ -51,14 +54,18 @@ public class TeacherRepositoryTest {
         var teacher = dataManager.create(Teacher.class);
         teacher.setUser(user);
         teacher = dataManager.save(teacher);
-        var createdUUID = List.of(teacher.getId());
-        var foundTeacher = teacherRepository.findByTeacherId(teacher.getId());
-        var foundUUID = foundTeacher.stream().map(Teacher::getId).collect(Collectors.toList());
+        var createdUUID = teacher.getId();
+        var fetchPlan = fetchPlans.builder(Teacher.class)
+                .addFetchPlan(FetchPlan.BASE)
+                .add("user")
+                .build();
+        var foundTeacher = teacherRepository.getById(teacher.getId(), fetchPlan);
+        var foundUUID = foundTeacher.getId();
         dataManager.remove(teacher);
         assertEquals(createdUUID, foundUUID, "Not equals");
-        assertNotNull(foundTeacher.get(0).getUser(), "User is null");
-        assertEquals(firstName, foundTeacher.get(0).getUser().getFirstName(), "Not equals");
-        assertEquals(lastName, foundTeacher.get(0).getUser().getLastName(), "Not equals");
+        assertNotNull(foundTeacher.getUser(), "User is null");
+        assertEquals(firstName, foundTeacher.getUser().getFirstName(), "Not equals");
+        assertEquals(lastName, foundTeacher.getUser().getLastName(), "Not equals");
     }
 
     @Test
