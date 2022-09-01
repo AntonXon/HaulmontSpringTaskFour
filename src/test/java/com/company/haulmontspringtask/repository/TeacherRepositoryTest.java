@@ -3,13 +3,8 @@ package com.company.haulmontspringtask.repository;
 
 import com.company.haulmontspringtask.BaseTest;
 import com.company.haulmontspringtask.entity.Teacher;
-import com.company.haulmontspringtask.entity.User;
-import io.jmix.core.DataManager;
 import io.jmix.core.FetchPlan;
 import io.jmix.core.FetchPlans;
-import io.jmix.core.security.SystemAuthenticator;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +29,7 @@ public class TeacherRepositoryTest extends BaseTest {
 
     @Test
     void findById() {
+        //given
         String firstName = "Ann";
         String lastName = "Petrov";
         var user = userRepository.create();
@@ -43,14 +39,16 @@ public class TeacherRepositoryTest extends BaseTest {
         var teacher = teacherRepository.create();
         teacher.setUser(user);
         teacher = teacherRepository.save(teacher);
+        entitiesToDelete.add(teacher);
         var createdUUID = teacher.getId();
         var fetchPlan = fetchPlans.builder(Teacher.class)
                 .addFetchPlan(FetchPlan.BASE)
                 .add("user")
                 .build();
+        //when
         var foundTeacher = teacherRepository.getById(teacher.getId(), fetchPlan);
         var foundUUID = foundTeacher.getId();
-        teacherRepository.delete(teacher);
+        //then
         assertEquals(createdUUID, foundUUID, "Not equals");
         assertNotNull(foundTeacher.getUser(), "User is null");
         assertEquals(firstName, foundTeacher.getUser().getFirstName(), "Not equals");
@@ -59,6 +57,7 @@ public class TeacherRepositoryTest extends BaseTest {
 
     @Test
     void findTeacherByName() {
+        //given
         String firstName = "Ann";
         String lastName = "Petrov";
         var user = userRepository.create();
@@ -68,10 +67,12 @@ public class TeacherRepositoryTest extends BaseTest {
         var teacher = teacherRepository.create();
         teacher.setUser(user);
         teacher = teacherRepository.save(teacher);
+        entitiesToDelete.add(teacher);
         List<UUID> createdUUID = Stream.of(teacher.getId()).collect(Collectors.toList());
+        //when
         List<Teacher> foundTeacher = teacherRepository.findTeachersByName(firstName, lastName);
         List<UUID> foundUUID = foundTeacher.stream().map(Teacher::getId).collect(Collectors.toList());
-        teacherRepository.delete(teacher);
+        //then
         assertEquals(createdUUID, foundUUID, "Not equals");
     }
 }
