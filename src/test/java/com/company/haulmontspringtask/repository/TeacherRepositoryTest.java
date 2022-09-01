@@ -1,6 +1,7 @@
 package com.company.haulmontspringtask.repository;
 
 
+import com.company.haulmontspringtask.BaseTest;
 import com.company.haulmontspringtask.entity.Teacher;
 import com.company.haulmontspringtask.entity.User;
 import io.jmix.core.DataManager;
@@ -23,25 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class TeacherRepositoryTest {
+public class TeacherRepositoryTest extends BaseTest {
     @Autowired
     TeacherRepository teacherRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
-    SystemAuthenticator systemAuthenticator;
-    @Autowired
     FetchPlans fetchPlans;
-
-    @BeforeEach
-    void setUp() {
-        systemAuthenticator.begin();
-    }
-
-    @AfterEach
-    void tearDown() {
-        systemAuthenticator.end();
-    }
 
     @Test
     void findById() {

@@ -1,5 +1,6 @@
 package com.company.haulmontspringtask.repository;
 
+import com.company.haulmontspringtask.BaseTest;
 import com.company.haulmontspringtask.entity.ExamSheet;
 import com.company.haulmontspringtask.entity.Teacher;
 import com.company.haulmontspringtask.entity.User;
@@ -18,25 +19,13 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class ExamSheetRepositoryTest {
+public class ExamSheetRepositoryTest extends BaseTest {
     @Autowired
     ExamSheetRepository examSheetRepository;
     @Autowired
     TeacherRepository teacherRepository;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    SystemAuthenticator systemAuthenticator;
-
-    @BeforeEach
-    void setUp() {
-        systemAuthenticator.begin();
-    }
-
-    @AfterEach
-    void tearDown() {
-        systemAuthenticator.end();
-    }
 
     @Test
     void getExamSheetByNumber() {
