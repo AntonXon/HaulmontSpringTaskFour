@@ -20,9 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class ExamSheetRepositoryTest {
     @Autowired
-    protected DataManager dataManager;
-    @Autowired
     ExamSheetRepository examSheetRepository;
+    @Autowired
+    TeacherRepository teacherRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     SystemAuthenticator systemAuthenticator;
 
@@ -38,45 +40,45 @@ public class ExamSheetRepositoryTest {
 
     @Test
     void getExamSheetByNumber() {
-        var user = dataManager.create(User.class);
+        var user = userRepository.create();
         user.setUsername("TEST");
-        var teacher = dataManager.create(Teacher.class);
+        var teacher = teacherRepository.create();
         teacher.setUser(user);
         Random random = new Random();
         String number1 = ExamSheet.class.getName() + random.nextInt();
-        var examSheet1 = dataManager.create(ExamSheet.class);
+        var examSheet1 = examSheetRepository.create();
         examSheet1.setNumber(number1);
         examSheet1.setTeacher(teacher);
         String number2 = ExamSheet.class.getName() + random.nextInt();
         //добавим лишнее
-        var examSheet2 = dataManager.create(ExamSheet.class);
+        var examSheet2 = examSheetRepository.create();
         examSheet2.setNumber(number2);
         examSheet2.setTeacher(teacher);
         teacher.setExamSheets(Set.of(examSheet1, examSheet2));
-        dataManager.save(teacher);
+        teacherRepository.save(teacher);
         var foundSheet = examSheetRepository.getExamSheetByNumber(number1);
-        dataManager.remove(teacher);
+        teacherRepository.delete(teacher);
         assertEquals(examSheet1.getId(), foundSheet.getId(), "Not equals");
     }
 
     @Test
     void getExamSheetsByTeacherEquals() {
-        var user = dataManager.create(User.class);
+        var user = userRepository.create();
         user.setUsername("TEST");
-        var teacher = dataManager.create(Teacher.class);
+        var teacher = teacherRepository.create();
         teacher.setUser(user);
-        var examSheet1 = dataManager.create(ExamSheet.class);
+        var examSheet1 = examSheetRepository.create();
         examSheet1.setNumber("1");
         examSheet1.setTeacher(teacher);
-        var examSheet2 = dataManager.create(ExamSheet.class);
+        var examSheet2 = examSheetRepository.create();
         examSheet2.setNumber("2");
         examSheet2.setTeacher(teacher);
         teacher.setExamSheets(Set.of(examSheet1, examSheet2));
-        dataManager.save(teacher);
+        teacherRepository.save(teacher);
         List<UUID> foundIds = examSheetRepository.getExamSheetsByTeacher(teacher)
                 .stream().sorted(Comparator.comparing(ExamSheet::getNumber)).map(ExamSheet::getId).collect(Collectors.toList());
         List<UUID> createdIds = List.of(examSheet1.getId(), examSheet2.getId());
-        dataManager.remove(teacher);
+        teacherRepository.delete(teacher);
         assertEquals(createdIds, foundIds, "Not equals");
     }
 }

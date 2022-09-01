@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 public class TeacherRepositoryTest {
     @Autowired
-    protected DataManager dataManager;
-    @Autowired
     TeacherRepository teacherRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     SystemAuthenticator systemAuthenticator;
     @Autowired
@@ -47,13 +47,13 @@ public class TeacherRepositoryTest {
     void findById() {
         String firstName = "Ann";
         String lastName = "Petrov";
-        var user = dataManager.create(User.class);
+        var user = userRepository.create();
         user.setUsername("Test_findById");
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        var teacher = dataManager.create(Teacher.class);
+        var teacher = teacherRepository.create();
         teacher.setUser(user);
-        teacher = dataManager.save(teacher);
+        teacher = teacherRepository.save(teacher);
         var createdUUID = teacher.getId();
         var fetchPlan = fetchPlans.builder(Teacher.class)
                 .addFetchPlan(FetchPlan.BASE)
@@ -61,7 +61,7 @@ public class TeacherRepositoryTest {
                 .build();
         var foundTeacher = teacherRepository.getById(teacher.getId(), fetchPlan);
         var foundUUID = foundTeacher.getId();
-        dataManager.remove(teacher);
+        teacherRepository.delete(teacher);
         assertEquals(createdUUID, foundUUID, "Not equals");
         assertNotNull(foundTeacher.getUser(), "User is null");
         assertEquals(firstName, foundTeacher.getUser().getFirstName(), "Not equals");
@@ -72,17 +72,17 @@ public class TeacherRepositoryTest {
     void findTeacherByName() {
         String firstName = "Ann";
         String lastName = "Petrov";
-        var user = dataManager.create(User.class);
+        var user = userRepository.create();
         user.setUsername("Test_findTeacherByName");
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        var teacher = dataManager.create(Teacher.class);
+        var teacher = teacherRepository.create();
         teacher.setUser(user);
-        teacher = dataManager.save(teacher);
+        teacher = teacherRepository.save(teacher);
         List<UUID> createdUUID = Stream.of(teacher.getId()).collect(Collectors.toList());
         List<Teacher> foundTeacher = teacherRepository.findTeachersByName(firstName, lastName);
         List<UUID> foundUUID = foundTeacher.stream().map(Teacher::getId).collect(Collectors.toList());
-        dataManager.remove(teacher);
+        teacherRepository.delete(teacher);
         assertEquals(createdUUID, foundUUID, "Not equals");
     }
 }

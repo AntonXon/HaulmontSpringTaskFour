@@ -7,6 +7,7 @@ import io.jmix.core.repository.JmixDataRepository;
 import java.util.List;
 import java.util.UUID;
 
+
 public interface ExamSheetRepository extends JmixDataRepository<ExamSheet, UUID> {
     ExamSheet getExamSheetByNumber(String number);
     List<ExamSheet> getExamSheetsByTeacher(Teacher teacher);
