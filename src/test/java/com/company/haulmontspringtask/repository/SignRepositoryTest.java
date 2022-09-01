@@ -1,6 +1,7 @@
 package com.company.haulmontspringtask.repository;
 
 import com.company.haulmontspringtask.BaseTest;
+import com.company.haulmontspringtask.dto.SignReportDto;
 import com.company.haulmontspringtask.entity.ExamSheet;
 import com.company.haulmontspringtask.entity.Sign;
 import com.company.haulmontspringtask.mongoRepository.SignRepository;
@@ -154,5 +155,40 @@ public class SignRepositoryTest extends BaseTest {
         signRepository.delete(sign2);
         //then
         assertEquals(createdSigns, foundSigns, "Not equals");
+    }
+
+    @Test
+    void getReport() {
+        //given
+        String firstName = "Ann";
+        String lastName = "Petrov";
+        var user = userRepository.create();
+        user.setUsername("Test");
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        var teacher = teacherRepository.create();
+        teacher.setUser(user);
+        Random random = new Random();
+        String number1 = ExamSheet.class.getSimpleName() + random.nextInt();
+        var examSheet1 = examSheetRepository.create();
+        examSheet1.setNumber(number1);
+        examSheet1.setTeacher(teacher);
+        String number2 = ExamSheet.class.getSimpleName() + random.nextInt();
+        var examSheet2 = examSheetRepository.create();
+        examSheet2.setNumber(number2);
+        examSheet2.setTeacher(teacher);
+        teacher.setExamSheets(Set.of(examSheet1, examSheet2));
+        teacherRepository.save(teacher);
+        entitiesToDelete.add(teacher);
+        Sign sign1 = signRepository.createSign(teacher, examSheet1);
+        Sign sign2 = signRepository.createSign(teacher, examSheet2);
+        //when
+        List<SignReportDto> report = signRepository.getReport();
+        signRepository.delete(sign1);
+        signRepository.delete(sign2);
+        //then
+        assertEquals(2, report.size());
+        assertEquals(teacher.getUser().getFirstName() + " " + teacher.getUser().getLastName(),
+                report.get(1).getTeacherName(), "Not equals");
     }
 }
